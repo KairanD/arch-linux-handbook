@@ -1,10 +1,10 @@
-# Arch Linux installation and configuration
+# Arch Linux Handbook
 
-- Written by: KairanD (Kairan Dashpaw).
-- Version: 1.0.
-- Date: 2026/06/12.
+- Written by: KairanD.
+- Version: 1.1.
+- Date: 2026/06/15.
 - GNOME version: 50.
-- License: this handbook is licensed under CC BY-NC-SA 4.0. You may share and adapt the content with attribution, but commercial use is not permitted, and derivative works must be released under the same license.
+- License: CC BY-NC-SA 4.0. You may share and adapt the content with attribution, but commercial use is not permitted, and derivative works must be released under the same license.
 
 I wrote this guide for people to easily replicate my Arch Linux GNOME install. It's also, of course, a place for me to keep instructions for future installs.
 
@@ -35,35 +35,20 @@ Type exit and press Enter.
 First, type `archinstall` and press Enter. Explanations:
 
 1. **Archinstall language:** select your preffered language to be used by the installer.
-
 2. **Locales:** first, choose the keyboard layout. The international English default is "us". For Brazil, for example, it's "br-abnt2". Search online for the specific layout you have. Next, choose your language using one of the options that end in "UTF-8". The first two letters represent the language, the two others the country. For example, American English is en_US.UTF-8. Brazilian Portuguese is pt_BR.UTF-8. For locale encoding, keep UTF-8.
-
 3. **Mirrors and repositories:** to get the best package download speeds, choose your country or the one closest to you. You don't need to add custom servers or repositories. The optional repositories can also be ignored: the testing ones are not necessary for common users, and multilib, that was useful for installing x86 (32 bit) packages on a x64 (64 bit) system, will not be used as long as we prioritize Flatpaks.
-
 4. **Disk configuration:** start partitioning on a best-effort default partition layout. Press Space to choose your disk and Enter to advance. For the main filesystem, choose ext4, since it's the most common, performant and has proven stability. Do not create a separate partition for /home (you should not keep important files on your computer anyway, use an external encrypted drive). We are going to ignore LVM and disk encryption. Attention: the selected drive will be completely wiped!
-
 5. **Swap:** keep the defaults. Swap on ZRAM uses some of available RAM in a compressed mode to store more information, without relying on slow disk swap. It's the most performant scenary for most systems. By default, Arch will create a ZRAM drive limited to 4 GB. For the compression algorithm, zstd provides the best compression ratio and is not that heavy. Keep zstd, it is generally the best option.
-
 6. **Bootloader:** if your computer is compatible with UEFI, keep "systemd-boot", since it's the simplest and fastest option. If your computer doesn't have access to UEFI (older than 2010, problably), then choose "Grub". For systemd-boot users, unified kernel images provide a more modern and organized booting experience, keeping everything in just one file, and I advise using it.
-
 7. **Kernels:** choose "linux" and "linux-lts" using the arrows and pressing Space. It's a good idea to keep a LTS (long-term support) kernel around if any problem happens with the mainline kernel (for example, an instability with your specific hardware, which is rare, but may occur).
-
 8. **Hostname:** type a name for your machine. You may use uppercase.
-
 9. **Authentication:** do not create a root password. Also ignore the U2F login option. Create a user account with your preferred name (only lowercase letters) and enable sudo for it.
-
 10. **Profile:** select the "Desktop" type. Then use the arrows and Space to select GNOME (you may use other desktop environment, but this tutorial is focused on GNOME). Keep the default ("all open-source") graphics driver and also the GNOME default greeter ("gdm").
-
 11. **Applications:** it's good to enable Bluetooth and print service, even if you don't plan to use printers or Bluetooth devices right now. Doing this, the necessary files are installed and the services are configured for any future use. For audio, choose "pipewire", the more modern and stable option when compared to "pulseaudio". If your computer is a laptop, you may enable "power-profiles-daemon" to have more detailed energy options on GNOME. For a firewall, I recommend ufw, since it's easier to configure. You can ignore the additional fonts option (Flatpaks have necesary fonts bundled).
-
 12. **Network configuration:** choose "use Network Manager (default backend)" to have Wi-Fi graphical controls on GNOME.
-
 13. **Pacman:** keep "color" on ("true"). This just highlights text when using pacman on a console application.
-
 14. **Additional packages:** skip this option. It's better to install the few necessary packages later.
-
 15. **Timezone:** choose accordingly to your timezone. Look for your country name.
-
 16. **Automatic time sync (NTP):** keep this on.
 
 Attention! If you have a computer with a mixed-mode UEFI (x86 UEFI with x64 processor), UKIs won't work (there are workarounds, but they are difficult, hard to do and may increase instability in future updates). So, go back and choose to not use UKIs. Also, after the install finishes, choose the option to do a chroot inside the installaled system. Then do:
@@ -85,6 +70,10 @@ Then install the firewall graphics user interface (GUFW) and an extension to sho
 ```
 sudo pacman -S gufw gnome-shell-extension-appindicator
 ```
+If you have a printer, also install common printer drivers:
+```
+sudo pacman -S gutenprint
+```
 
 ### Extensions
 
@@ -105,21 +94,24 @@ Reboot your system for changes to take effect. Now you'll have a working brightn
 
 ### Hardware specific adjustments
 
+#### Computers with modern Nvidia GPUs
+
 If you use a current Nvidia Graphics card (GTX 1600 (Turing) series or later), you definately want to install the Nvidia driver and reboot:
 ```
 sudo pacman -S nvidia-open-dkms linux-headers linux-lts-headers
 ```
-If you have a current AMD GPU, such as the RX 7600 XT, there may be spikes during idle that heat the card a little. If that's the case, do and reboot:
+
+#### Computers with modern AMD GPUs
+
+If you have a current AMD GPU, such as the RX 7600 XT, the best drivers (open source) are already installed. However, there may be spikes during idle that heat the card a little. If that's the case, do and reboot:
 ```
-echo 'options amdgpu ppfeaturemask=0xFFFF7777' | sudo tee -a /etc/modprobe.d/99-amdgpu-overdrive.conf > /dev/null
+echo "options amdgpu ppfeaturemask=0xFFFF7777" | sudo tee -a /etc/modprobe.d/99-amdgpu-overdrive.conf > /dev/null
 sudo mkinitcpio -P
 ```
-For laptops with old and unsupported Nvidia dedicated cards, I recommend using bbswitch to disable the card and use only integrated graphics. The commands below will reduce power consumption and heat after a reboot. Choose `opencl-mesa` when asked:
-```
-sudo pacman -S bumblebee bbswitch-dkms linux-headers linux-lts-headers primus
-sudo gpasswd -a $USER bumblebee
-sudo systemctl enable bumblebeed.service
-```
+
+#### Laptops with old (and probably not very useful) Nvidia dedicated GPUs
+
+Old Nvidia graphics cards can be a pain on Linux. If you have a laptop with one, such as the GT 740M my ASUS S46CB has, the best approach is to completely disable the card and use only integrated graphics. These cards are slow and their driver support has been terminated for a long time. Check my other repository and follow the instructions to disable yours: https://github.com/KairanD/disable-nvidia-linux
 
 ## Applications
 
@@ -149,10 +141,10 @@ These are other applications I use.
 * Impression (Khaleel Al-Adhami): creates Linux boot drives.
 * Minion (Good Game Mods, LLC): addon manager for The Elder Scrolls Online.
 * OpenRGB (Adam Honse, OpenRGB Team): manages RGB devices.
-* Protontricks: software to manage Steam's Proton game prefixes.
+* Protontricks (Janne Pulkkinen): software to manage Steam's Proton game prefixes.
 * Refine (Hari Rana (TheEvilSkeleton)): additional options for GNOME.
 * Steam (Valve Corporation): Steam client.
-* Unity Hub: downloads and install versions of the Unity Editor for game making.
+* Unity Hub (Unity Technologies): downloads and install versions of the Unity Editor for game making.
 * VSCodium (The VSCodium team): VSCode without Microsoft's telemetry.
 * WineCharm (Mohammed Asif Ali Rizvan): simple GUI for using WINE and installing .exe and .msi applications.
 
@@ -191,7 +183,7 @@ Then, open Flatseal and add this variable for Rhythmbox: `GTK_THEME=adw-gtk3-dar
 
 Steam needs udev rules to properly connect to joysticks. They are provided in the "resources" folder within this repository. Open a Console in the same folder you downloaded the file and do:
 ```
-sudo cp 60-steam-input.rules /usr/lib/udev/rules.d/
+sudo cp 60-steam-input.rules /etc/udev/rules.d/
 echo "uinput" | sudo tee -a /etc/modules-load.d/uinput.conf > /dev/null
 sudo modprobe uinput
 ```
@@ -238,9 +230,9 @@ It's also good to go to the energy options and disable automatic suspension and 
 
 ### Windows 11
 
-To install Windows 11 on Boxes, first we need to disable the absurd TPM 2.0 requirement. Press Shift + F10 when the incompatibility screen appears. Then type `regedit` and go to HKEY_LOCAL_MACHINE\SYSTEM\Setup. Create a new key labeled "LabConfig". Create a 32 bit DWORD value containing `BypassTPMCheck = 1`.
+To install Windows 11 on Boxes, first we need to disable the TPM 2.0 requirement. Press Shift + F10 when the incompatibility screen appears. Then type `regedit` and go to HKEY_LOCAL_MACHINE\SYSTEM\Setup. Create a new key labeled "LabConfig". Create a 32 bit DWORD value containing `BypassTPMCheck = 1`. Click to go back and try again.
 
-To disable the annoying Microsoft account requirement and create a local account, press Shift + F10 when the region selection screen appears. The type `OOBE\BYPASSNRO`. If you're connect to the Internet using a cable, disconnect it. Then wait for system reboot and choose the option "I don't have Internet" to procced to the creation of a local account.
+To disable the Microsoft account requirement and create a local account, press Shift + F10 when the region selection screen appears. If you're connected to the Internet using a cable, disconnect it. If it's Wi-Fi, disable it temporarily. Then type `OOBE\BYPASSNRO`. Wait for the system to reboot and procced to the creation of a local account.
 
 To have faster speed and automatic resolution resizing, use your virtual machine to go to https://www.spice-space.org/download.html and download and install the Spice Guest Tools for Windows. To have folder sharing, also install the Spice WebDAV Daemon.
 
@@ -307,7 +299,7 @@ Some Steam games may require additional steps to work or accept mods. See the li
 
 Open the game at least one time. Then, install the "Protontricks" application and access the game's prefix. Select the option to install Windows components. Choose d3dcompiler_47 and vcrun2022, install and close. On Steam, insert `WINEDLLOVERRIDES="winmm,version=n,b" %command%` as a launch option.
 
-#### Rocked League
+#### Rocket League
 
 The Linux version was discontinued after Epic Games unfortunately bought the game. However, you can force Steam to use Proton Experimental and use the Windows version normally.
 
@@ -332,4 +324,4 @@ Win32UltraLowLatencyMode=0
 
 Minion is available to install at the Software application to manage AddOns. The folder's default location is `/home/arch/.var/app/com.valvesoftware.Steam/.steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/AddOns/`.
 
-I also have an application to update Tamriel Trade Centre's (TTC) database. Check the tool's repository.
+I also have an application to update Tamriel Trade Centre's (TTC) database. Check the tool's repository: https://github.com/KairanD/ttc-eso-linux
