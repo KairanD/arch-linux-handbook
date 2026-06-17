@@ -1,14 +1,18 @@
 # Arch Linux Handbook
 
 - Written by: KairanD.
-- Version: 1.1.
-- Date: 2026/06/15.
+- Version: 1.2.
+- Date: 2026/06/17.
 - GNOME version: 50.
 - License: CC BY-NC-SA 4.0. You may share and adapt the content with attribution, but commercial use is not permitted, and derivative works must be released under the same license.
 
 I wrote this guide for people to easily replicate my Arch Linux GNOME install. It's also, of course, a place for me to keep instructions for future installs.
 
 ## Installation
+
+### Download ISO
+
+The Arch ISO can be downloaded on https://archlinux.org/download/. You can use applications such as Rufus, Balena Etcher and Impression to create the bootable USB.
 
 ### Internet connection
 
@@ -98,7 +102,7 @@ Reboot your system for changes to take effect. Now you'll have a working brightn
 
 If you use a current Nvidia Graphics card (GTX 1600 (Turing) series or later), you definately want to install the Nvidia driver and reboot:
 ```
-sudo pacman -S nvidia-open-dkms linux-headers linux-lts-headers
+sudo pacman -S nvidia-open-dkms nvidia-settings libva-nvidia-driver linux-headers linux-lts-headers
 ```
 
 #### Computers with modern AMD GPUs
@@ -119,7 +123,7 @@ Old Nvidia graphics cards can be a pain on Linux. If you have a laptop with one,
 
 These are the essential applications I always install on my computers.
 
-* Extension Manager (Matthew Jakeman): downloads GNOME extensions.
+* Extension Manager (Matthew Jakeman): downloads and updates GNOME extensions.
 * Firefox (Mozilla): great open source non-chromium web browser.
 * Flatseal (Martin Abente Lahaye): manages Flatpak application's permitions.
 * Krita (Krita Foundation): digital painting software with some image manipulations tools.
@@ -142,7 +146,6 @@ These are other applications I use.
 * Minion (Good Game Mods, LLC): addon manager for The Elder Scrolls Online.
 * OpenRGB (Adam Honse, OpenRGB Team): manages RGB devices.
 * Protontricks (Janne Pulkkinen): software to manage Steam's Proton game prefixes.
-* Refine (Hari Rana (TheEvilSkeleton)): additional options for GNOME.
 * Steam (Valve Corporation): Steam client.
 * Unity Hub (Unity Technologies): downloads and install versions of the Unity Editor for game making.
 * VSCodium (The VSCodium team): VSCode without Microsoft's telemetry.
@@ -206,7 +209,7 @@ Some versions of the Unity Editor crash when loading a project. It is necessary 
 
 - **System:** on screen tab, configure screen resolution and frequency (activate variable refresh rate if available) and activate night light. On energy tab, disable automatic suspension when connected to an outlet, and activate battery percentage show. On multitasking, disable the active corner and choose to show applications only from the current workspace. On appearance, change the wallpaper. On mouse and touchpad, disable mouse acceleration and configure sensibility as wanted. On system, activate the option to show the week day and change the name and picture of your user.
 - **General:** on the show applications view, sort your apps by alphabetical order. At the upper menu, click the clock, look for meteorology and choose your city.
-- **Refine:** on the Refine application, choose size 10 for all fonts. Go to the "Shell & Compositor" tab and grab and position the window buttons on "Button and window layout".
+- **Adjustments:** on the Adjustments application, choose 0,90 as font scaling. Go to the "Windows" tab and activate maximize and minimize buttons.
 - **Dash to Dock:** disable autohide, disable the options to show volumns and the recycling bin, change the click action to "minimize or show previews", choose "alternate workspace" as rolling action, activate the compact dock option, disable the option to show general view at boot, choose points as the window counting indicators with dominant color, change the dock color to black and fix opacity on 80%.
 - **GNOME Disks:** open the Disks application and format any additional drives with ext4, choosing an easy to remember label. You can edit mount options: disable user defaults and enable "LABEL" as the identifier, so the disk will be automatically mounted and appear on Nautilus (the file explorer) with its label. You can also choose to "edit filesystem" of any partition and add or change a label.
 
