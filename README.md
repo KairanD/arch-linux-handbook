@@ -1,7 +1,7 @@
 # Arch Linux Handbook
 
 - Written by: KairanD.
-- Version: 1.2.
+- Version: 1.3.
 - Date: 2026/06/17.
 - GNOME version: 50.
 - License: CC BY-NC-SA 4.0. You may share and adapt the content with attribution, but commercial use is not permitted, and derivative works must be released under the same license.
@@ -143,6 +143,7 @@ These are other applications I use.
 * GitHub Desktop (shiftkey): unofficial GitHub Linux client.
 * HydraPaper (Gabriele Musco): selection of different wallpapers for multiple monitors.
 * Impression (Khaleel Al-Adhami): creates Linux boot drives.
+* Minecraft (Mojang AB): official Minecraft launcher.
 * Minion (Good Game Mods, LLC): addon manager for The Elder Scrolls Online.
 * OpenRGB (Adam Honse, OpenRGB Team): manages RGB devices.
 * Protontricks (Janne Pulkkinen): software to manage Steam's Proton game prefixes.
@@ -241,11 +242,24 @@ To have faster speed and automatic resolution resizing, use your virtual machine
 
 On Windows 11, disable Delivery Optimization. Then go to the privacy options tab and disable every telemetry you can. Also do a little debloat editing your system bar and removing unwanted applications. Finally, start the Disk Cleaning tool, choose to clean system files, select everything and wait.
 
-## Troubleshooting
+## Maintenance
+
+### Good practices
+
+Arch can be very reliable. To make it that way, focus on these actions:
+- **Flatpaks, Snaps and AppImages are your best friends:** prioritize packages from Flathub (https://flathub.org/), the Snap Store (https://snapcraft.io/store), and the AppImage Hub (https://www.appimagehub.com/). These packages contain the necessary dependencies to function and will not interfere with system operation. The fewer packages that are installed from the repositories, the lower the chance of bugs after updates.
+- **Trust the official repositories:** packages from official repositories, installed using the command `sudo pacman -S`, are synchronized with the system. If Flatpaks are not available, install packages this way.
+- **Avoid the Arch User Repository (AUR):** the AUR is a community repository, vulnerable to viruses and broken packages. It's dangerous for people without proper knowledge. I would always avoid it.
+- **Don't install random scripts:** do not download and install random scripts from the Internet. They can easily break your system.
+- **Always check the Arch Linux website:** before updating your system, always check the Arch website for news about problems and manual interventions.
+- **Avoid partial updates:** always update using the command `sudo pacman -Syu` and complete the procedure. Running the command and then aborting the process can unintentionally trigger a partial update when installing a package afterward. Partial updates may create dependency conflicts and break your system.
+- **Don't be anxious:** you don't need to update every day. One time per month - during the last weekend - is enough.
+- **Try the LTS kernel if necesary:** we have installed the LTS kernel as a backup option. If the mainline kernel introduces problems, then choose LTS during boot.
+- **Read the wiki:** the Arch Linux Wiki is one of the most comprehensive resources available. If you have questions about the system or before running any command, read it!
 
 ### Updating and cleaning
 
-To update your system (one time per month is enough, during the last weekend of the month), open the Console application and run:
+To update your system, open the Console application and run:
 ```
 sudo pacman -Syu
 ```
@@ -266,9 +280,13 @@ To remove unused Flatpak packages:
 flatpak uninstall --unused
 ```
 
-### Issue solving
+## Troubleshooting
 
-#### Corrupted Pacman cache
+### Outdated keyring
+
+If you don't update your system for a long time (for example, 6 months), your keyring may get outdated and the update command will not work. To solve this, run `sudo pacman -S archlinux-keyring` and then try to update again.
+
+### Corrupted Pacman cache
 
 If your system ever crashes when updating, Pacman's download cache may break. Then, do:
 ```
@@ -280,7 +298,7 @@ sudo rm /var/lib/pacman/db.lck
 ```
 To remove the lock.
 
-#### Crashing when updating on computers with less than 4 GB of RAM
+### Crashing when updating on computers with less than 4 GB of RAM
 
 If your computer has less than 4 GB of RAM, it may crash during system updates. To solve that, let's create a swapfile:
 ```
