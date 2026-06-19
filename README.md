@@ -1,18 +1,24 @@
 # Arch Linux Handbook
 
 - Written by: KairanD.
-- Version: 1.3.
-- Date: 2026/06/17.
+- Version: 1.4.
+- Date: 2026/06/19.
 - GNOME version: 50.
-- License: CC BY-NC-SA 4.0. You may share and adapt the content with attribution, but commercial use is not permitted, and derivative works must be released under the same license.
+- License: CC BY-SA 4.0. You may share and adapt the content with attribution, and derivative works must be released under the same license.
 
 I wrote this guide for people to easily replicate my Arch Linux GNOME install. It's also, of course, a place for me to keep instructions for future installs.
+
+### Additional credits
+
+The contents on the "resources" folder were downloaded from:
+- 60-openrgb.rules: OpenRGB by Adam Honse (@CalcProgrammer1), available at: https://gitlab.com/CalcProgrammer1/OpenRGB
+- 60-steam-input.rules: Steam Devices by Valve Software (@ValveSoftware), available at: https://github.com/ValveSoftware/steam-devices
 
 ## Installation
 
 ### Download ISO
 
-The Arch ISO can be downloaded on https://archlinux.org/download/. You can use applications such as Rufus, Balena Etcher and Impression to create the bootable USB.
+The Arch ISO can be downloaded on https://archlinux.org/download/. It is updated every month, generally at the first day. You can use applications such as Rufus, Balena Etcher and Impression to create the bootable USB.
 
 ### Internet connection
 
@@ -48,7 +54,7 @@ First, type `archinstall` and press Enter. Explanations:
 8. **Hostname:** type a name for your machine. You may use uppercase.
 9. **Authentication:** do not create a root password. Also ignore the U2F login option. Create a user account with your preferred name (only lowercase letters) and enable sudo for it.
 10. **Profile:** select the "Desktop" type. Then use the arrows and Space to select GNOME (you may use other desktop environment, but this tutorial is focused on GNOME). Keep the default ("all open-source") graphics driver and also the GNOME default greeter ("gdm").
-11. **Applications:** it's good to enable Bluetooth and print service, even if you don't plan to use printers or Bluetooth devices right now. Doing this, the necessary files are installed and the services are configured for any future use. For audio, choose "pipewire", the more modern and stable option when compared to "pulseaudio". If your computer is a laptop, you may enable "power-profiles-daemon" to have more detailed energy options on GNOME. For a firewall, I recommend ufw, since it's easier to configure. You can ignore the additional fonts option (Flatpaks have necesary fonts bundled).
+11. **Applications:** it's good to enable Bluetooth and print service, even if you don't plan to use printers or Bluetooth devices right now. Doing this, the necessary files are installed and the services are configured for any future use. For audio, choose "pipewire", the more modern and stable option when compared to "pulseaudio". If your computer is a laptop, you may enable "power-profiles-daemon" to have more detailed energy options on GNOME. For a firewall, I recommend ufw, since it's easier to configure. You can select all the additional fonts option.
 12. **Network configuration:** choose "use Network Manager (default backend)" to have Wi-Fi graphical controls on GNOME.
 13. **Pacman:** keep "color" on ("true"). This just highlights text when using pacman on a console application.
 14. **Additional packages:** skip this option. It's better to install the few necessary packages later.
@@ -73,6 +79,10 @@ sudo pacman -Syu
 Then install the firewall graphics user interface (GUFW) and an extension to show app indicators on GNOME's panel (necessary for applications such as Steam or Discord, or they may not close properly):
 ```
 sudo pacman -S gufw gnome-shell-extension-appindicator
+```
+To format disks in NTFS or FAT32 on GNOME Disks, install these packages:
+```
+sudo pacman -S dosfstools ntfs-3g ntfsprogs
 ```
 If you have a printer, also install common printer drivers:
 ```
@@ -214,9 +224,9 @@ Some versions of the Unity Editor crash when loading a project. It is necessary 
 - **Dash to Dock:** disable autohide, disable the options to show volumns and the recycling bin, change the click action to "minimize or show previews", choose "alternate workspace" as rolling action, activate the compact dock option, disable the option to show general view at boot, choose points as the window counting indicators with dominant color, change the dock color to black and fix opacity on 80%.
 - **GNOME Disks:** open the Disks application and format any additional drives with ext4, choosing an easy to remember label. You can edit mount options: disable user defaults and enable "LABEL" as the identifier, so the disk will be automatically mounted and appear on Nautilus (the file explorer) with its label. You can also choose to "edit filesystem" of any partition and add or change a label.
 
-### Applications:
+### Applications
 
-- **Nautilus:**: activate the option to show folders before files.
+- **Nautilus:** activate the option to show folders before files.
 - **Firefox:** disable favorites bar, activate the option to always ask where to save downloaded files, disable paid shortcuts, choose DuckDuckGo as the search engine. On the privacy and security tab, activate "Tell websites not to sell or share my data" and disable all the telemetry options.
 - **Rhythmbox:** on Flatseal, add access permissions for where your songs are saved. Also import your playlists.
 - **Mission Center:** on the CPU tab, right click and select "show logical processors".
