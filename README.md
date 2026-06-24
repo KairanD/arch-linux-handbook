@@ -1,8 +1,8 @@
 # Arch Linux Handbook
 
 - Written by: KairanD.
-- Version: 1.4.
-- Date: 2026/06/19.
+- Version: 1.5.
+- Date: 2026/06/24.
 - GNOME version: 50.
 - License: CC BY-SA 4.0. You may share and adapt the content with attribution, and derivative works must be released under the same license.
 
@@ -48,7 +48,7 @@ First, type `archinstall` and press Enter. Explanations:
 2. **Locales:** first, choose the keyboard layout. The international English default is "us". For Brazil, for example, it's "br-abnt2". Search online for the specific layout you have. Next, choose your language using one of the options that end in "UTF-8". The first two letters represent the language, the two others the country. For example, American English is en_US.UTF-8. Brazilian Portuguese is pt_BR.UTF-8. For locale encoding, keep UTF-8.
 3. **Mirrors and repositories:** to get the best package download speeds, choose your country or the one closest to you. You don't need to add custom servers or repositories. The optional repositories can also be ignored: the testing ones are not necessary for common users, and multilib, that was useful for installing x86 (32 bit) packages on a x64 (64 bit) system, will not be used as long as we prioritize Flatpaks.
 4. **Disk configuration:** start partitioning on a best-effort default partition layout. Press Space to choose your disk and Enter to advance. For the main filesystem, choose ext4, since it's the most common, performant and has proven stability. Do not create a separate partition for /home (you should not keep important files on your computer anyway, use an external encrypted drive). We are going to ignore LVM and disk encryption. Attention: the selected drive will be completely wiped!
-5. **Swap:** keep the defaults. Swap on ZRAM uses some of available RAM in a compressed mode to store more information, without relying on slow disk swap. It's the most performant scenary for most systems. By default, Arch will create a ZRAM drive limited to 4 GB. For the compression algorithm, zstd provides the best compression ratio and is not that heavy. Keep zstd, it is generally the best option.
+5. **Swap:** swap on ZRAM uses some of available RAM in a compressed mode to store more information, without relying on slow disk swap. It's the most performant scenary for most systems. By default, Arch will create a ZRAM drive limited to 4 GB. For the compression algorithm, zstd provides the best compression ratio, but demands more processing power. Choose lz4, it is generally the more balanced option.
 6. **Bootloader:** if your computer is compatible with UEFI, keep "systemd-boot", since it's the simplest and fastest option. If your computer doesn't have access to UEFI (older than 2010, problably), then choose "Grub". For systemd-boot users, unified kernel images provide a more modern and organized booting experience, keeping everything in just one file, and I advise using it.
 7. **Kernels:** choose "linux" and "linux-lts" using the arrows and pressing Space. It's a good idea to keep a LTS (long-term support) kernel around if any problem happens with the mainline kernel (for example, an instability with your specific hardware, which is rare, but may occur).
 8. **Hostname:** type a name for your machine. You may use uppercase.
@@ -108,6 +108,15 @@ Reboot your system for changes to take effect. Now you'll have a working brightn
 
 ### Hardware specific adjustments
 
+#### ZRAM size for computers with less than 8 GB RAM:
+
+By default, zram-generator creates a ZRAM device of half the size of the installed RAM, limited to 4 GiB. This can be insufficient. To force a 4 GiB ZRAM device, run:
+```
+sudo tee -a /etc/systemd/zram-generator.conf <<'EOF'
+zram-size = 4096
+EOF
+```
+
 #### Computers with modern Nvidia GPUs
 
 If you use a current Nvidia Graphics card (GTX 1600 (Turing) series or later), you definately want to install the Nvidia driver and reboot:
@@ -157,8 +166,11 @@ These are other applications I use.
 * Minion (Good Game Mods, LLC): addon manager for The Elder Scrolls Online.
 * OpenRGB (Adam Honse, OpenRGB Team): manages RGB devices.
 * Protontricks (Janne Pulkkinen): software to manage Steam's Proton game prefixes.
+* SoundConverter (Gautier Portet): multi format audio files converter.
 * Steam (Valve Corporation): Steam client.
+* Steam Link (Valve Corporation): application to receive straming signal from a Steam client.
 * Unity Hub (Unity Technologies): downloads and install versions of the Unity Editor for game making.
+* Video Downloader (Unrud): downloads video and audio from YouTube and other sources.
 * VSCodium (The VSCodium team): VSCode without Microsoft's telemetry.
 * WineCharm (Mohammed Asif Ali Rizvan): simple GUI for using WINE and installing .exe and .msi applications.
 
@@ -176,6 +188,10 @@ sudo usermod -a -G uucp $USER
 #### Discord
 
 Discord won't allow resizing the window at half screen when the monitor resolution is below 1920x1080. To solve that, open the file `/home/linux/.var/app/com.discordapp.Discord/config/discord/settings.json` and add the lines `"MIN_WIDTH": 0,` and `"MIN_HEIGHT": 0,` before the end of the file.
+
+#### Firefox
+
+Old computers may be uncapable of decoding VP8/VP9 videos. The extension h264ify (https://addons.mozilla.org/pt-BR/firefox/addon/h264ify/) allows streaming of h264 videos. It may be useful for computers around 10 or more years old, reducing processor usage.
 
 #### OpenRGB
 
@@ -210,6 +226,10 @@ sudo ufw allow 27037/tcp
 sudo ufw reload
 ```
 
+#### Steam Link:
+
+To use joysticks, it is necessary to copy the rules. But also to open Flatseal and add access to the folder /dev/uinput:ro.
+
 #### Unity Hub
 
 Some versions of the Unity Editor crash when loading a project. It is necessary to replace a file. Search for the "Data" folder on your Editor install folder (generally located in /home/$USER/Unity). Then replace the original "bee_backend" file for the one provided in the "resources" folder within this repository.
@@ -218,16 +238,17 @@ Some versions of the Unity Editor crash when loading a project. It is necessary 
 
 ### System
 
-- **System:** on screen tab, configure screen resolution and frequency (activate variable refresh rate if available) and activate night light. On energy tab, disable automatic suspension when connected to an outlet, and activate battery percentage show. On multitasking, disable the active corner and choose to show applications only from the current workspace. On appearance, change the wallpaper. On mouse and touchpad, disable mouse acceleration and configure sensibility as wanted. On system, activate the option to show the week day and change the name and picture of your user.
+- **System:** on screen tab, configure screen resolution and frequency (activate variable refresh rate if available) and activate night light (reducing the intensity to the first level). On energy tab, disable automatic suspension when connected to an outlet, and activate battery percentage show. On multitasking, disable the active corner and choose to show applications only from the current workspace. On appearance, change the wallpaper. On mouse and touchpad, disable mouse acceleration and configure sensibility as wanted. On system, activate the option to show the week day and change the name and picture of your user.
 - **General:** on the show applications view, sort your apps by alphabetical order. At the upper menu, click the clock, look for meteorology and choose your city.
 - **Adjustments:** on the Adjustments application, choose 0,90 as font scaling. Go to the "Windows" tab and activate maximize and minimize buttons.
-- **Dash to Dock:** disable autohide, disable the options to show volumns and the recycling bin, change the click action to "minimize or show previews", choose "alternate workspace" as rolling action, activate the compact dock option, disable the option to show general view at boot, choose points as the window counting indicators with dominant color, change the dock color to black and fix opacity on 80%.
+- **Dash to Dock:** disable autohide, choose size 36, disable the options to show volumns and the recycling bin, change the click action to "minimize or show previews", choose "alternate workspace" as rolling action, activate the compact dock option, disable the option to show general view at boot, choose points as the window counting indicators with dominant color, change the dock color to black and fix opacity on 80%.
 - **GNOME Disks:** open the Disks application and format any additional drives with ext4, choosing an easy to remember label. You can edit mount options: disable user defaults and enable "LABEL" as the identifier, so the disk will be automatically mounted and appear on Nautilus (the file explorer) with its label. You can also choose to "edit filesystem" of any partition and add or change a label.
+- **Software:** disable automatic Flatpak updates, disable automatic updates notifications.
 
 ### Applications
 
 - **Nautilus:** activate the option to show folders before files.
-- **Firefox:** disable favorites bar, activate the option to always ask where to save downloaded files, disable paid shortcuts, choose DuckDuckGo as the search engine. On the privacy and security tab, activate "Tell websites not to sell or share my data" and disable all the telemetry options.
+- **Firefox:** disable favorites bar, disable widgets, activate the option to always ask where to save downloaded files, disable paid shortcuts, choose DuckDuckGo as the search engine. On the privacy and security tab, activate "Tell websites not to sell or share my data" and disable all the telemetry options.
 - **Rhythmbox:** on Flatseal, add access permissions for where your songs are saved. Also import your playlists.
 - **Mission Center:** on the CPU tab, right click and select "show logical processors".
 
@@ -325,6 +346,10 @@ Then reboot and everything goes back to normal, using ZRAM.
 ### Steam game adjustments
 
 Some Steam games may require additional steps to work or accept mods. See the list below.
+
+#### Counter-Strike 2:
+
+The game may fail to capture mouse inputs. On Steam, insert `SDL_VIDEO_DRIVER=x11 %command% -fullscreen` as a launch option.
 
 #### Cyberpunk (mods)
 
