@@ -1,8 +1,8 @@
 # Arch Linux Handbook
 
 - Written by: KairanD.
-- Version: 1.5.
-- Date: 2026/06/24.
+- Version: 1.6.
+- Date: 2026/07/09.
 - GNOME version: 50.
 - License: CC BY-SA 4.0. You may share and adapt the content with attribution, and derivative works must be released under the same license.
 
@@ -160,8 +160,10 @@ These are other applications I use.
 * Boxes (The GNOME Project): virtual machines manager.
 * Discord (Discord Inc.): Discord client.
 * GitHub Desktop (shiftkey): unofficial GitHub Linux client.
+* GIMP (The GIMP team): image manipulation application.
 * HydraPaper (Gabriele Musco): selection of different wallpapers for multiple monitors.
 * Impression (Khaleel Al-Adhami): creates Linux boot drives.
+* Godots (Maxim Kovkel): manager for multiple versions of the Godot game engine editor.
 * Minecraft (Mojang AB): official Minecraft launcher.
 * Minion (Good Game Mods, LLC): addon manager for The Elder Scrolls Online.
 * OpenRGB (Adam Honse, OpenRGB Team): manages RGB devices.
@@ -173,6 +175,7 @@ These are other applications I use.
 * Video Downloader (Unrud): downloads video and audio from YouTube and other sources.
 * VSCodium (The VSCodium team): VSCode without Microsoft's telemetry.
 * WineCharm (Mohammed Asif Ali Rizvan): simple GUI for using WINE and installing .exe and .msi applications.
+* WiVRn server (Guillaume Meunier, Patrick Nicolas et al): streaming tool for virtual and mixed reality headsets.
 
 ### Application specific fixes
 
@@ -189,9 +192,13 @@ sudo usermod -a -G uucp $USER
 
 Discord won't allow resizing the window at half screen when the monitor resolution is below 1920x1080. To solve that, open the file `/home/linux/.var/app/com.discordapp.Discord/config/discord/settings.json` and add the lines `"MIN_WIDTH": 0,` and `"MIN_HEIGHT": 0,` before the end of the file.
 
+On old computers, hardware acceleration may introduce problems. Disable it on Discord's "System" options if you notice slowdowns or crashes.
+
 #### Firefox
 
 Old computers may be uncapable of decoding VP8/VP9 videos. The extension h264ify (https://addons.mozilla.org/pt-BR/firefox/addon/h264ify/) allows streaming of h264 videos. It may be useful for computers around 10 or more years old, reducing processor usage.
+
+Computers with less processing power may also struggle to load web pages with too many ads. You can use the uBlock Origin extension (https://addons.mozilla.org/pt-BR/firefox/addon/ublock-origin/) to block ads. Remmeber that blocking ads prevents content creators from getting paid by ad networks. Try to always support your favorite websites and creators!
 
 #### OpenRGB
 
@@ -225,14 +232,42 @@ sudo ufw allow 27036/tcp
 sudo ufw allow 27037/tcp
 sudo ufw reload
 ```
+MangoHUD can be used as an in-game system resources monitor. On the software store, search for the Freedesktop Platform. There, install MangoHud. To activate it on a Steam game, try these launch options (you can customize what is shown):
+```
+MANGOHUD=1 MANGOHUD_CONFIG="fps,frametime,cpu_stats,cpu_temp,gpu_stats,gpu_temp,ram,vram" %command%
+```
+To limit the maximum FPS rate in a game (for this example, 75 FPS), add to MangoHUD:
+```
+MANGOHUD=1 MANGOHUD_CONFIG="fps_limit=75" %command%
+```
 
-#### Steam Link:
+#### Steam Link
 
-To use joysticks, it is necessary to copy the rules. But also to open Flatseal and add access to the folder /dev/uinput:ro.
+To use joysticks, it is necessary to copy the rules as described above. But also to open Flatseal and add access to the folder /dev/uinput:ro.
 
 #### Unity Hub
 
-Some versions of the Unity Editor crash when loading a project. It is necessary to replace a file. Search for the "Data" folder on your Editor install folder (generally located in /home/$USER/Unity). Then replace the original "bee_backend" file for the one provided in the "resources" folder within this repository.
+Some versions of the Unity Editor crash when loading a project. It is necessary to add a file. Search for the "Data" folder on your Editor install folder (generally located in /home/$USER/Unity). Then rename the original "bee_backend" file as "bee_backend_real" and copy the "bee_backend" file provided in the "resources" folder within this repository.
+
+#### WiVRn
+
+Don't use SteamVR and WiVRn at the same time. WiVRn is a complete replacement for SteamVR. Install the WiVRn server from the GNOME Software Store and the WiVRn client on the Meta Quest, using the Meta Store. The versions must match.
+
+First, enable Avahi: `sudo systemctl enable --now avahi-daemon`. Then, open necessary ports on UFW firewall: `sudo ufw allow 5353/udp` and `sudo ufw allow 9757`. Then, allow the Steam Flatpak to access these files:
+```
+flatpak override \
+  --filesystem=xdg-run/wivrn:ro \
+  --filesystem=xdg-data/flatpak/app/io.github.wivrn.wivrn:ro \
+  --filesystem=/var/lib/flatpak/app/io.github.wivrn.wivrn:ro \
+  --filesystem=xdg-config/openxr:ro \
+  --filesystem=xdg-config/openvr:ro \
+  com.valvesoftware.Steam
+```
+For each Steam game you want to run, add these launch options on Steam:
+```
+PRESSURE_VESSEL_IMPORT_OPENXR_1_RUNTIMES=1 PRESSURE_VESSEL_FILESYSTEMS_RW=/var/lib/flatpak/app/io.github.wivrn.wivrn %command%
+```
+Open the WiVRn server on your computer and it will appear on the headset's client. If necessary (it may not be automatic), change the audio source on the computer for the one created by WiVRn.
 
 ## Configuration
 
@@ -347,7 +382,11 @@ Then reboot and everything goes back to normal, using ZRAM.
 
 Some Steam games may require additional steps to work or accept mods. See the list below.
 
-#### Counter-Strike 2:
+#### Battlefield 4
+
+The game has issues if the FPS rate is too high. Since there is no way to limit the FPS in game, use MangoHUD as described above.
+
+#### Counter-Strike 2
 
 The game may fail to capture mouse inputs. On Steam, insert `SDL_VIDEO_DRIVER=x11 %command% -fullscreen` as a launch option.
 
