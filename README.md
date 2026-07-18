@@ -1,8 +1,8 @@
 # Arch Linux Handbook
 
 - Written by: KairanD.
-- Version: 1.6.
-- Date: 2026/07/09.
+- Version: 1.7.
+- Date: 2026/07/17.
 - GNOME version: 50.
 - License: CC BY-SA 4.0. You may share and adapt the content with attribution, and derivative works must be released under the same license.
 
@@ -45,10 +45,10 @@ Type exit and press Enter.
 First, type `archinstall` and press Enter. Explanations:
 
 1. **Archinstall language:** select your preffered language to be used by the installer.
-2. **Locales:** first, choose the keyboard layout. The international English default is "us". For Brazil, for example, it's "br-abnt2". Search online for the specific layout you have. Next, choose your language using one of the options that end in "UTF-8". The first two letters represent the language, the two others the country. For example, American English is en_US.UTF-8. Brazilian Portuguese is pt_BR.UTF-8. For locale encoding, keep UTF-8.
+2. **Locales:** first, choose the keyboard layout. The international English default is "us". For Brazil, for example, it is "br-abnt2". Search online for the specific layout you have. Next, choose your language using one of the options that end in "UTF-8". The first two letters represent the language, the two others the country. For example, American English is en_US.UTF-8. Brazilian Portuguese is pt_BR.UTF-8. For locale encoding, keep UTF-8.
 3. **Mirrors and repositories:** to get the best package download speeds, choose your country or the one closest to you. You don't need to add custom servers or repositories. The optional repositories can also be ignored: the testing ones are not necessary for common users, and multilib, that was useful for installing x86 (32 bit) packages on a x64 (64 bit) system, will not be used as long as we prioritize Flatpaks.
-4. **Disk configuration:** start partitioning on a best-effort default partition layout. Press Space to choose your disk and Enter to advance. For the main filesystem, choose ext4, since it's the most common, performant and has proven stability. Do not create a separate partition for /home (you should not keep important files on your computer anyway, use an external encrypted drive). We are going to ignore LVM and disk encryption. Attention: the selected drive will be completely wiped!
-5. **Swap:** swap on ZRAM uses some of available RAM in a compressed mode to store more information, without relying on slow disk swap. It's the most performant scenary for most systems. By default, Arch will create a ZRAM drive limited to 4 GB. For the compression algorithm, zstd provides the best compression ratio, but demands more processing power. Choose lz4, it is generally the more balanced option.
+4. **Disk configuration:** choose manual partitioning and select your disk. We are going to create a 1000 MiB fat32 partition, mounted at /boot, and a EXT4 system partition using the remaining space, mounted at /.
+5. **Swap:** disable swap on zram. We will configure a swapfile to use zswap later, since it provides the best of both worlds: compressible pages are stored in a compressed space in RAM, while incompressible pages are stored in a swapfile.
 6. **Bootloader:** if your computer is compatible with UEFI, keep "systemd-boot", since it's the simplest and fastest option. If your computer doesn't have access to UEFI (older than 2010, problably), then choose "Grub". For systemd-boot users, unified kernel images provide a more modern and organized booting experience, keeping everything in just one file, and I advise using it.
 7. **Kernels:** choose "linux" and "linux-lts" using the arrows and pressing Space. It's a good idea to keep a LTS (long-term support) kernel around if any problem happens with the mainline kernel (for example, an instability with your specific hardware, which is rare, but may occur).
 8. **Hostname:** type a name for your machine. You may use uppercase.
@@ -69,6 +69,21 @@ bootctl install
 exit
 ```
 This will install the necesary x86 boot files for systemd-boot. Some common computers with this hardware configuration are old Apple Macbooks and Intel Bay-Trail based Atom tablets and netbooks, such as the ASUS T100TA.
+
+### Configure swapfile
+
+The Arch kernels already enable zswap by default, we just need to create a swapfile. I recommend using 1/4 of your available RAM, or at least 4 GiB. First, let's create the file ("4G", in this example, means 4 GiB. Change the size accordingly):
+```
+mkswap -U clear --size 4G --file /swapfile
+```
+Activate the swapfile:
+```
+sudo swapon /swapfile
+```
+Now, add the swapfile to the fstab, so it will be turned on when the system boots:
+```
+echo '/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
+```
 
 ### Install essential packages
 
@@ -364,20 +379,6 @@ sudo rm /var/lib/pacman/db.lck
 ```
 To remove the lock.
 
-### Crashing when updating on computers with less than 4 GB of RAM
-
-If your computer has less than 4 GB of RAM, it may crash during system updates. To solve that, let's create a swapfile:
-```
-sudo mkswap -U clear --size 4G --file /swapfile
-```
-Then, everytime you want to update, run those commands on Console to temporarily use the swapfile:
-```
-sudo swapon /swapfile
-sudo swapoff /dev/zram0
-sudo pacman -Syu
-```
-Then reboot and everything goes back to normal, using ZRAM.
-
 ### Steam game adjustments
 
 Some Steam games may require additional steps to work or accept mods. See the list below.
@@ -388,7 +389,7 @@ The game has issues if the FPS rate is too high. Since there is no way to limit 
 
 #### Counter-Strike 2
 
-The game may fail to capture mouse inputs. On Steam, insert `SDL_VIDEO_DRIVER=x11 %command% -fullscreen` as a launch option.
+The game may fail to capture mouse inputs. On Steam, insert `SDL_VIDEO_DRIVER=x11 %command%` as a launch option.
 
 #### Cyberpunk (mods)
 
@@ -400,7 +401,7 @@ The Linux version was discontinued after Epic Games unfortunately bought the gam
 
 #### Rocksmith 2014 Remastered (Real Tone Cable)
 
-Open the game at least one time. Then, install the "Protontricks" application and access the game's prefix. Choose the option to change configurations. Choose `sound=alsa` as the sound engine. Now go back on Protontricks and "execute winecfg". Select the Real Tone Cable as the entry audio source. You can also change some options on the Rocksmith.ini file (located at the game's install folder) to improve latency:
+Open the game at least one time. Then, install the "Protontricks" application and access the game's prefix. Choose the option to change configurations. Choose `sound=alsa` as the sound engine. Now go back on Protontricks and "execute winecfg". Select the Real Tone Cable as the entry audio source. Now change these options on the Rocksmith.ini file (located at the game's install folder):
 ```
 EnableMicrophone=1
 ExclusiveMode=0
