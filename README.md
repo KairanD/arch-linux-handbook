@@ -1,8 +1,8 @@
 # Arch Linux Handbook
 
 - Written by: KairanD.
-- Version: 1.7.
-- Date: 2026/07/17.
+- Version: 1.8.
+- Date: 2026/07/18.
 - GNOME version: 50.
 - License: CC BY-SA 4.0. You may share and adapt the content with attribution, and derivative works must be released under the same license.
 
@@ -45,9 +45,9 @@ Type exit and press Enter.
 First, type `archinstall` and press Enter. Explanations:
 
 1. **Archinstall language:** select your preffered language to be used by the installer.
-2. **Locales:** first, choose the keyboard layout. The international English default is "us". For Brazil, for example, it is "br-abnt2". Search online for the specific layout you have. Next, choose your language using one of the options that end in "UTF-8". The first two letters represent the language, the two others the country. For example, American English is en_US.UTF-8. Brazilian Portuguese is pt_BR.UTF-8. For locale encoding, keep UTF-8.
+2. **Locales:** first, choose the keyboard layout. The international English default is "us". For Brazil, for example, it is "br-abnt2". Search online for the specific layout you have. Next, choose your language using one of the options that end in "UTF-8". The first two letters represent the language, the two others the country. For example, American English is en_US.UTF-8. Brazilian Portuguese is pt_BR.UTF-8. For locale encoding, keep UTF-8. Also keep the default console font.
 3. **Mirrors and repositories:** to get the best package download speeds, choose your country or the one closest to you. You don't need to add custom servers or repositories. The optional repositories can also be ignored: the testing ones are not necessary for common users, and multilib, that was useful for installing x86 (32 bit) packages on a x64 (64 bit) system, will not be used as long as we prioritize Flatpaks.
-4. **Disk configuration:** choose manual partitioning and select your disk. We are going to create a 1000 MiB fat32 partition, mounted at /boot, and a EXT4 system partition using the remaining space, mounted at /.
+4. **Disk configuration:** choose manual partitioning and select your disk. To create a partition, select the free space. We are going to create a 1000 MiB fat32 partition, mounted at /boot, and a EXT4 system partition using the remaining space, mounted at /. Confirm and go back.
 5. **Swap:** disable swap on zram. We will configure a swapfile to use zswap later, since it provides the best of both worlds: compressible pages are stored in a compressed space in RAM, while incompressible pages are stored in a swapfile.
 6. **Bootloader:** if your computer is compatible with UEFI, keep "systemd-boot", since it's the simplest and fastest option. If your computer doesn't have access to UEFI (older than 2010, problably), then choose "Grub". For systemd-boot users, unified kernel images provide a more modern and organized booting experience, keeping everything in just one file, and I advise using it.
 7. **Kernels:** choose "linux" and "linux-lts" using the arrows and pressing Space. It's a good idea to keep a LTS (long-term support) kernel around if any problem happens with the mainline kernel (for example, an instability with your specific hardware, which is rare, but may occur).
@@ -123,15 +123,6 @@ Reboot your system for changes to take effect. Now you'll have a working brightn
 
 ### Hardware specific adjustments
 
-#### ZRAM size for computers with less than 8 GB RAM:
-
-By default, zram-generator creates a ZRAM device of half the size of the installed RAM, limited to 4 GiB. This can be insufficient. To force a 4 GiB ZRAM device, run:
-```
-sudo tee -a /etc/systemd/zram-generator.conf <<'EOF'
-zram-size = 4096
-EOF
-```
-
 #### Computers with modern Nvidia GPUs
 
 If you use a current Nvidia Graphics card (GTX 1600 (Turing) series or later), you definately want to install the Nvidia driver and reboot:
@@ -149,7 +140,7 @@ sudo mkinitcpio -P
 
 #### Laptops with old (and probably not very useful) Nvidia dedicated GPUs
 
-Old Nvidia graphics cards can be a pain on Linux. If you have a laptop with one, such as the GT 740M my ASUS S46CB has, the best approach is to completely disable the card and use only integrated graphics. These cards are slow and their driver support has been terminated for a long time. Check my other repository and follow the instructions to disable yours: https://github.com/KairanD/disable-nvidia-linux
+Old Nvidia graphics cards can be a pain on Linux. If you have a laptop with one, such as the GT 740M my ASUS S46CB has, the best approach is to completely disable the card and use only integrated graphics. These cards are slow and their driver support has been terminated for a long time. Check my other repository and follow the instructions to disable yours: https://github.com/kairand/disable-nvidia-linux
 
 ## Applications
 
@@ -160,10 +151,9 @@ These are the essential applications I always install on my computers.
 * Extension Manager (Matthew Jakeman): downloads and updates GNOME extensions.
 * Firefox (Mozilla): great open source non-chromium web browser.
 * Flatseal (Martin Abente Lahaye): manages Flatpak application's permitions.
-* Krita (Krita Foundation): digital painting software with some image manipulations tools.
+* GIMP (The GIMP team): image manipulation application.
 * LibreOffice (The Document Foundation): complete office suite.
 * Mission Center (Mission Center Developers): shows usage of system resources and open processes.
-* PDF Arranger (The PDF Arranger team): edits and resizes PDF files.
 * Rhythmbox (The Rhythmbox developers): complete music player for local files.
 * Solanum (Christopher Davis): pomodoro tracker to help with your tasks.
 
@@ -172,16 +162,19 @@ These are the essential applications I always install on my computers.
 These are other applications I use.
 
 * Arduino IDE v2 (Arduino SA): default Arduino IDE.
+* Bottles (The Bottles Contributors): wine prefixes manager.
 * Boxes (The GNOME Project): virtual machines manager.
 * Discord (Discord Inc.): Discord client.
+* Fragments (Felix Häcker): torrent downloader and manager.
 * GitHub Desktop (shiftkey): unofficial GitHub Linux client.
-* GIMP (The GIMP team): image manipulation application.
+* Godots (Maxim Kovkel): manager for multiple versions of the Godot game engine editor.
 * HydraPaper (Gabriele Musco): selection of different wallpapers for multiple monitors.
 * Impression (Khaleel Al-Adhami): creates Linux boot drives.
-* Godots (Maxim Kovkel): manager for multiple versions of the Godot game engine editor.
+* Krita (Krita Foundation): digital painting software with some image manipulations tools.
 * Minecraft (Mojang AB): official Minecraft launcher.
 * Minion (Good Game Mods, LLC): addon manager for The Elder Scrolls Online.
 * OpenRGB (Adam Honse, OpenRGB Team): manages RGB devices.
+* PDF Arranger (The PDF Arranger team): edits and resizes PDF files.
 * Protontricks (Janne Pulkkinen): software to manage Steam's Proton game prefixes.
 * SoundConverter (Gautier Portet): multi format audio files converter.
 * Steam (Valve Corporation): Steam client.
@@ -189,7 +182,6 @@ These are other applications I use.
 * Unity Hub (Unity Technologies): downloads and install versions of the Unity Editor for game making.
 * Video Downloader (Unrud): downloads video and audio from YouTube and other sources.
 * VSCodium (The VSCodium team): VSCode without Microsoft's telemetry.
-* WineCharm (Mohammed Asif Ali Rizvan): simple GUI for using WINE and installing .exe and .msi applications.
 * WiVRn server (Guillaume Meunier, Patrick Nicolas et al): streaming tool for virtual and mixed reality headsets.
 
 ### Application specific fixes
@@ -268,7 +260,7 @@ Some versions of the Unity Editor crash when loading a project. It is necessary 
 
 Don't use SteamVR and WiVRn at the same time. WiVRn is a complete replacement for SteamVR. Install the WiVRn server from the GNOME Software Store and the WiVRn client on the Meta Quest, using the Meta Store. The versions must match.
 
-First, enable Avahi: `sudo systemctl enable --now avahi-daemon`. Then, open necessary ports on UFW firewall: `sudo ufw allow 5353/udp` and `sudo ufw allow 9757`. Then, allow the Steam Flatpak to access these files:
+First, enable Avahi: `sudo systemctl enable --now avahi-daemon`. Then, open necessary ports on UFW firewall: `sudo ufw allow 5353/udp` and `sudo ufw allow 9757`. Then, allow the Steam Flatpak to access these files (the files access permission can also be granted using Flatseal):
 ```
 flatpak override \
   --filesystem=xdg-run/wivrn:ro \
@@ -340,7 +332,7 @@ Arch can be very reliable. To make it that way, focus on these actions:
 
 ### Updating and cleaning
 
-To update your system, open the Console application and run:
+To update your system, first check the Arch Linux homepage (https://archlinux.org/) to see if any manual intervention is going to be necessary. Then open the Console application and run (pay attention to any notification):
 ```
 sudo pacman -Syu
 ```
@@ -362,6 +354,21 @@ flatpak uninstall --unused
 ```
 
 ## Troubleshooting
+
+### Error checking
+
+Use this command on Console to check if any systemd services have failed:
+```
+systemctl --failed
+```
+To check for errors in log files:
+```
+journalctl -b
+```
+To see the pacman package installation and update history:
+```
+nano /var/log/pacman.log
+```
 
 ### Outdated keyring
 
@@ -420,4 +427,4 @@ Win32UltraLowLatencyMode=0
 
 Minion is available to install at the Software application to manage AddOns. The folder's default location is `/home/arch/.var/app/com.valvesoftware.Steam/.steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/AddOns/`.
 
-I also have an application to update Tamriel Trade Centre's (TTC) database. Check the tool's repository: https://github.com/KairanD/ttc-eso-linux
+I also have an application to update Tamriel Trade Centre's (TTC) database. Check the tool's repository: https://github.com/kairand/ttc-eso-linux
