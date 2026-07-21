@@ -1,8 +1,8 @@
 # Arch Linux Handbook
 
 - Written by: KairanD.
-- Version: 1.8.
-- Date: 2026/07/18.
+- Version: 1.9.
+- Date: 2026/07/21.
 - GNOME version: 50.
 - License: CC BY-SA 4.0. You may share and adapt the content with attribution, and derivative works must be released under the same license.
 
@@ -47,14 +47,14 @@ First, type `archinstall` and press Enter. Explanations:
 1. **Archinstall language:** select your preffered language to be used by the installer.
 2. **Locales:** first, choose the keyboard layout. The international English default is "us". For Brazil, for example, it is "br-abnt2". Search online for the specific layout you have. Next, choose your language using one of the options that end in "UTF-8". The first two letters represent the language, the two others the country. For example, American English is en_US.UTF-8. Brazilian Portuguese is pt_BR.UTF-8. For locale encoding, keep UTF-8. Also keep the default console font.
 3. **Mirrors and repositories:** to get the best package download speeds, choose your country or the one closest to you. You don't need to add custom servers or repositories. The optional repositories can also be ignored: the testing ones are not necessary for common users, and multilib, that was useful for installing x86 (32 bit) packages on a x64 (64 bit) system, will not be used as long as we prioritize Flatpaks.
-4. **Disk configuration:** choose manual partitioning and select your disk. To create a partition, select the free space. We are going to create a 1000 MiB fat32 partition, mounted at /boot, and a EXT4 system partition using the remaining space, mounted at /. Confirm and go back.
+4. **Disk configuration:** choose best-effort (automatic) partitioning. By default, it is going to create a 1 GiB fat32 partition, mounted at /boot, and a EXT4 system partition using the remaining space, mounted at /. Confirm and go back.
 5. **Swap:** disable swap on zram. We will configure a swapfile to use zswap later, since it provides the best of both worlds: compressible pages are stored in a compressed space in RAM, while incompressible pages are stored in a swapfile.
 6. **Bootloader:** if your computer is compatible with UEFI, keep "systemd-boot", since it's the simplest and fastest option. If your computer doesn't have access to UEFI (older than 2010, problably), then choose "Grub". For systemd-boot users, unified kernel images provide a more modern and organized booting experience, keeping everything in just one file, and I advise using it.
 7. **Kernels:** choose "linux" and "linux-lts" using the arrows and pressing Space. It's a good idea to keep a LTS (long-term support) kernel around if any problem happens with the mainline kernel (for example, an instability with your specific hardware, which is rare, but may occur).
 8. **Hostname:** type a name for your machine. You may use uppercase.
 9. **Authentication:** do not create a root password. Also ignore the U2F login option. Create a user account with your preferred name (only lowercase letters) and enable sudo for it.
 10. **Profile:** select the "Desktop" type. Then use the arrows and Space to select GNOME (you may use other desktop environment, but this tutorial is focused on GNOME). Keep the default ("all open-source") graphics driver and also the GNOME default greeter ("gdm").
-11. **Applications:** it's good to enable Bluetooth and print service, even if you don't plan to use printers or Bluetooth devices right now. Doing this, the necessary files are installed and the services are configured for any future use. For audio, choose "pipewire", the more modern and stable option when compared to "pulseaudio". If your computer is a laptop, you may enable "power-profiles-daemon" to have more detailed energy options on GNOME. For a firewall, I recommend ufw, since it's easier to configure. You can select all the additional fonts option.
+11. **Applications:** it's good to enable Bluetooth and print service, even if you don't plan to use printers or Bluetooth devices right now. Doing this, the necessary files are installed and the services are configured for any future use. For audio, choose "pipewire", the more modern and stable option when compared to "pulseaudio". If your computer is a laptop, you may enable "power-profiles-daemon" to have more detailed energy options on GNOME (this option will be visible only if you have a laptop). For a firewall, I recommend ufw, since it's easier to configure. You can select all the additional fonts option.
 12. **Network configuration:** choose "use Network Manager (default backend)" to have Wi-Fi graphical controls on GNOME.
 13. **Pacman:** keep "color" on ("true"). This just highlights text when using pacman on a console application.
 14. **Additional packages:** skip this option. It's better to install the few necessary packages later.
@@ -74,7 +74,7 @@ This will install the necesary x86 boot files for systemd-boot. Some common comp
 
 The Arch kernels already enable zswap by default, we just need to create a swapfile. I recommend using 1/4 of your available RAM, or at least 4 GiB. First, let's create the file ("4G", in this example, means 4 GiB. Change the size accordingly):
 ```
-mkswap -U clear --size 4G --file /swapfile
+sudo mkswap -U clear --size 4G --file /swapfile
 ```
 Activate the swapfile:
 ```
@@ -97,7 +97,7 @@ sudo pacman -S gufw gnome-shell-extension-appindicator
 ```
 To format disks in NTFS or FAT32 on GNOME Disks, install these packages:
 ```
-sudo pacman -S dosfstools ntfs-3g ntfsprogs
+sudo pacman -S dosfstools ntfsprogs
 ```
 If you have a printer, also install common printer drivers:
 ```
@@ -116,10 +116,9 @@ sudo pacman -S ddcutil
 sudo modprobe i2c-dev
 sudo cp /usr/share/ddcutil/data/60-ddcutil-i2c.rules /etc/udev/rules.d
 sudo usermod $USER -aG i2c
-sudo touch /etc/modules-load.d/i2c.conf
-sudo sh -c 'echo "i2c-dev" >> /etc/modules-load.d/i2c.conf'
+echo 'i2c-dev' | sudo tee -a /etc/modules-load.d/i2c.conf
 ```
-Reboot your system for changes to take effect. Now you'll have a working brightness control widget at your panel.
+Now you'll have a working brightness control widget at your panel. Open its settings to configure the "button location" as "system menu".
 
 ### Hardware specific adjustments
 
@@ -134,7 +133,7 @@ sudo pacman -S nvidia-open-dkms nvidia-settings libva-nvidia-driver linux-header
 
 If you have a current AMD GPU, such as the RX 7600 XT, the best drivers (open source) are already installed. However, there may be spikes during idle that heat the card a little. If that's the case, do and reboot:
 ```
-echo "options amdgpu ppfeaturemask=0xFFFF7777" | sudo tee -a /etc/modprobe.d/99-amdgpu-overdrive.conf > /dev/null
+echo 'options amdgpu ppfeaturemask=0xFFFF7777' | sudo tee -a /etc/modprobe.d/99-amdgpu-overdrive.conf
 sudo mkinitcpio -P
 ```
 
@@ -197,6 +196,8 @@ sudo usermod -a -G uucp $USER
 
 #### Discord
 
+Go to "appearance" and select the option to change theme accordingly to the system. On system, disable minimize to system tray.
+
 Discord won't allow resizing the window at half screen when the monitor resolution is below 1920x1080. To solve that, open the file `/home/linux/.var/app/com.discordapp.Discord/config/discord/settings.json` and add the lines `"MIN_WIDTH": 0,` and `"MIN_HEIGHT": 0,` before the end of the file.
 
 On old computers, hardware acceleration may introduce problems. Disable it on Discord's "System" options if you notice slowdowns or crashes.
@@ -221,7 +222,7 @@ Rhythmbox is a GTK3 app. The Flatpak version needs the dark theme package and an
 ```
 flatpak install flathub org.gtk.Gtk3theme.adw-gtk3-dark
 ```
-Then, open Flatseal and add this variable for Rhythmbox: `GTK_THEME=adw-gtk3-dark`.
+Then, open Flatseal and add this variable for Rhythmbox: `GTK_THEME=adw-gtk3-dark`. Also delete the default "best classificated" playlist.
 
 #### Steam
 
@@ -256,6 +257,10 @@ To use joysticks, it is necessary to copy the rules as described above. But also
 
 Some versions of the Unity Editor crash when loading a project. It is necessary to add a file. Search for the "Data" folder on your Editor install folder (generally located in /home/$USER/Unity). Then rename the original "bee_backend" file as "bee_backend_real" and copy the "bee_backend" file provided in the "resources" folder within this repository.
 
+#### VSCodium:
+
+Go to settings, window and "auto detect color scheme" to enable light and dark theme switching.
+
 #### WiVRn
 
 Don't use SteamVR and WiVRn at the same time. WiVRn is a complete replacement for SteamVR. Install the WiVRn server from the GNOME Software Store and the WiVRn client on the Meta Quest, using the Meta Store. The versions must match.
@@ -280,17 +285,17 @@ Open the WiVRn server on your computer and it will appear on the headset's clien
 
 ### System
 
-- **System:** on screen tab, configure screen resolution and frequency (activate variable refresh rate if available) and activate night light (reducing the intensity to the first level). On energy tab, disable automatic suspension when connected to an outlet, and activate battery percentage show. On multitasking, disable the active corner and choose to show applications only from the current workspace. On appearance, change the wallpaper. On mouse and touchpad, disable mouse acceleration and configure sensibility as wanted. On system, activate the option to show the week day and change the name and picture of your user.
+- **System:** on screen tab, configure screen resolution and frequency (activate variable refresh rate if available) and activate night light (reducing the intensity to the first level). If you have more than one screen, move the numbered windows until they are in a great position. On energy tab, disable automatic screen turnoff, disable automatic suspension when connected to an outlet, and activate battery percentage show. On multitasking, disable the active corner and choose to show applications only from the current workspace. On appearance, change the wallpaper. On applications, set Firefox as the default browser. On mouse and touchpad, disable mouse acceleration and configure sensibility as wanted. On system, activate the option to show the week day and change the name and picture of your user.
 - **General:** on the show applications view, sort your apps by alphabetical order. At the upper menu, click the clock, look for meteorology and choose your city.
 - **Adjustments:** on the Adjustments application, choose 0,90 as font scaling. Go to the "Windows" tab and activate maximize and minimize buttons.
-- **Dash to Dock:** disable autohide, choose size 36, disable the options to show volumns and the recycling bin, change the click action to "minimize or show previews", choose "alternate workspace" as rolling action, activate the compact dock option, disable the option to show general view at boot, choose points as the window counting indicators with dominant color, change the dock color to black and fix opacity on 80%.
-- **GNOME Disks:** open the Disks application and format any additional drives with ext4, choosing an easy to remember label. You can edit mount options: disable user defaults and enable "LABEL" as the identifier, so the disk will be automatically mounted and appear on Nautilus (the file explorer) with its label. You can also choose to "edit filesystem" of any partition and add or change a label.
+- **Dash to Dock:** position and size: disable autohide, choose size 36. Launchers: disable the options to show volumns and the recycling bin. Behavior: change the click action to "minimize or show previews", choose "alternate workspace" as rolling action. Appearance: activate the compact dock option, disable the option to show general view at boot, choose points as the window counting indicators with dominant color, change the dock color to black and fix opacity on 80%.
+- **GNOME Disks:** open the Disks application and format any additional drives with ext4, choosing an easy to remember label. Edit mount options: disable user defaults and enable "LABEL" as the identifier, so the disk will be automatically mounted and appear on Nautilus (the file explorer) with its label. You can also choose to "edit filesystem" of any partition and add or change a label.
 - **Software:** disable automatic Flatpak updates, disable automatic updates notifications.
 
 ### Applications
 
 - **Nautilus:** activate the option to show folders before files.
-- **Firefox:** disable favorites bar, disable widgets, activate the option to always ask where to save downloaded files, disable paid shortcuts, choose DuckDuckGo as the search engine. On the privacy and security tab, activate "Tell websites not to sell or share my data" and disable all the telemetry options.
+- **Firefox:** disable favorites bar, activate the option to always ask where to save downloaded files, disable paid shortcuts, choose DuckDuckGo as the search engine and disable the others except Google. On the privacy and security tab, activate "Tell websites not to sell or share my data" and disable all the Mozilla's telemetry options.
 - **Rhythmbox:** on Flatseal, add access permissions for where your songs are saved. Also import your playlists.
 - **Mission Center:** on the CPU tab, right click and select "show logical processors".
 
