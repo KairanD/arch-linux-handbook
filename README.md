@@ -1,8 +1,8 @@
 # Arch Linux Handbook
 
 - Written by: KairanD.
-- Version: 1.9.
-- Date: 2026/07/21.
+- Version: 1.9.1.
+- Date: 2026/09/27.
 - GNOME version: 50.
 - License: CC BY-SA 4.0. You may share and adapt the content with attribution, and derivative works must be released under the same license.
 
@@ -91,9 +91,9 @@ Open the Console application. First, check that the system is updated:
 ```
 sudo pacman -Syu
 ```
-Then install the firewall graphics user interface (GUFW) and an extension to show app indicators on GNOME's panel (necessary for applications such as Steam or Discord, or they may not close properly):
+Then install the firewall graphics user interface (GUFW), an extension to show app indicators on GNOME's panel (necessary for applications such as Steam or Discord, or they may not close properly), and a CLI system information tool:
 ```
-sudo pacman -S gufw gnome-shell-extension-appindicator
+sudo pacman -S gufw gnome-shell-extension-appindicator fastfetch
 ```
 To format disks in NTFS or FAT32 on GNOME Disks, install these packages:
 ```
@@ -119,6 +119,10 @@ sudo usermod $USER -aG i2c
 echo 'i2c-dev' | sudo tee -a /etc/modules-load.d/i2c.conf
 ```
 Now you'll have a working brightness control widget at your panel. Open its settings to configure the "button location" as "system menu".
+
+### Microsoft fonts
+
+To ensure good compatibility with documents created by Microsoft applications, we need to add Microsoft fonts. I recommend extracting the fonts from a Windows ISO and creating a .fonts folder in the home directory to put the fonts inside.
 
 ### Hardware specific adjustments
 
@@ -148,13 +152,12 @@ Old Nvidia graphics cards can be a pain on Linux. If you have a laptop with one,
 These are the essential applications I always install on my computers.
 
 * Extension Manager (Matthew Jakeman): downloads and updates GNOME extensions.
-* Firefox (Mozilla): great open source non-chromium web browser.
 * Flatseal (Martin Abente Lahaye): manages Flatpak application's permitions.
 * GIMP (The GIMP team): image manipulation application.
 * LibreOffice (The Document Foundation): complete office suite.
 * Mission Center (Mission Center Developers): shows usage of system resources and open processes.
 * Rhythmbox (The Rhythmbox developers): complete music player for local files.
-* Solanum (Christopher Davis): pomodoro tracker to help with your tasks.
+* VLC (VideoLAN et al.): the universal media player, with amazing compatibility.
 
 ### Other Flatpaks
 
@@ -163,25 +166,35 @@ These are other applications I use.
 * Arduino IDE v2 (Arduino SA): default Arduino IDE.
 * Bottles (The Bottles Contributors): wine prefixes manager.
 * Boxes (The GNOME Project): virtual machines manager.
+* Chromium (The Chromium Authors): alternative web browser.
+* Dconf Editor (GNOME Project): edit hidden system options.
+* Deep Dive (Tanay Bhomia): complete pomodoro timer.
+* Descodificator (Bilal Elmoussaoui): reads and generates QR codes.
 * Discord (Discord Inc.): Discord client.
+* Earbud manager for Galaxy Buds (Tim Schneeberger): audio manager for Samsung's Galaxy Buds.
 * Fragments (Felix Häcker): torrent downloader and manager.
+* Galaxy Buds Manager (Tim Schneeberger): software for configuring Galaxy Buds specific features.
 * GitHub Desktop (shiftkey): unofficial GitHub Linux client.
 * Godots (Maxim Kovkel): manager for multiple versions of the Godot game engine editor.
 * HydraPaper (Gabriele Musco): selection of different wallpapers for multiple monitors.
 * Impression (Khaleel Al-Adhami): creates Linux boot drives.
+* Keypunch (Brage Fuglseth): check how fast you can type.
 * Krita (Krita Foundation): digital painting software with some image manipulations tools.
+* LosslessCut (Mikael Finstad): quick and easy editor for video files.
 * Minecraft (Mojang AB): official Minecraft launcher.
 * Minion (Good Game Mods, LLC): addon manager for The Elder Scrolls Online.
 * OpenRGB (Adam Honse, OpenRGB Team): manages RGB devices.
 * PDF Arranger (The PDF Arranger team): edits and resizes PDF files.
+* PDF Tricks (Murilo Venturoso): compresses PDF files.
+* Parabolic (Nickvision): downloads videos from the web.
 * Protontricks (Janne Pulkkinen): software to manage Steam's Proton game prefixes.
 * SoundConverter (Gautier Portet): multi format audio files converter.
 * Steam (Valve Corporation): Steam client.
 * Steam Link (Valve Corporation): application to receive straming signal from a Steam client.
 * Unity Hub (Unity Technologies): downloads and install versions of the Unity Editor for game making.
-* Video Downloader (Unrud): downloads video and audio from YouTube and other sources.
 * VSCodium (The VSCodium team): VSCode without Microsoft's telemetry.
 * WiVRn server (Guillaume Meunier, Patrick Nicolas et al): streaming tool for virtual and mixed reality headsets.
+* Xournal++ (Xournalpp Developers): note taking app for drawing tablets.
 
 ### Application specific fixes
 
@@ -246,8 +259,17 @@ MANGOHUD=1 MANGOHUD_CONFIG="fps,frametime,cpu_stats,cpu_temp,gpu_stats,gpu_temp,
 ```
 To limit the maximum FPS rate in a game (for this example, 75 FPS), add to MangoHUD:
 ```
-MANGOHUD=1 MANGOHUD_CONFIG="fps_limit=75" %command%
+MANGOHUD=1 MANGOHUD_CONFIG="fps_limit=100" %command%
 ```
+Sometimes, the software store may install a MangoHUD version that has a runtime that differs from Steam's. This will prevent MangoHUD from working. To solve, first check the Steam runtime version:
+```
+flatpak info com.valvesoftware.Steam | grep Runtime
+```
+The last numbers (for example, 25.08) are the runtime. Then install a correct version of MangoHUD using the console application:
+```
+flatpak install org.freedesktop.Platform.VulkanLayer.MangoHud
+```
+Choose the number that matches the runtime used by Steam. In the future, it may be necessary to do this procedure again after Steam updates its runtime.
 
 #### Steam Link
 
@@ -255,9 +277,9 @@ To use joysticks, it is necessary to copy the rules as described above. But also
 
 #### Unity Hub
 
-Some versions of the Unity Editor crash when loading a project. It is necessary to add a file. Search for the "Data" folder on your Editor install folder (generally located in /home/$USER/Unity). Then rename the original "bee_backend" file as "bee_backend_real" and copy the "bee_backend" file provided in the "resources" folder within this repository.
+Some versions of the Unity Editor crash when loading a project. It is necessary to add a file. Search for the "Data" folder on your Editor install folder (generally located in /home/$USER/Unity). Then rename the original "bee_backend" file as "bee_backend_real" and copy the "bee_backend" file provided in the "resources" folder within this repository. It should be marked as executable.
 
-#### VSCodium:
+#### VSCodium
 
 Go to settings, window and "auto detect color scheme" to enable light and dark theme switching.
 
@@ -280,6 +302,12 @@ For each Steam game you want to run, add these launch options on Steam:
 PRESSURE_VESSEL_IMPORT_OPENXR_1_RUNTIMES=1 PRESSURE_VESSEL_FILESYSTEMS_RW=/var/lib/flatpak/app/io.github.wivrn.wivrn %command%
 ```
 Open the WiVRn server on your computer and it will appear on the headset's client. If necessary (it may not be automatic), change the audio source on the computer for the one created by WiVRn.
+
+If you have a Meta Quest and want to use a USB connection (way less latency), first install the adb package:
+```
+sudo apt install adb
+```
+Then you need to enter the Meta Developers website (https://developers.meta.com/horizon/manage/) and create a organization for your account. Then use the Meta Horizon app on your smartphone, connect to your headset, go to options and activate developer mode. Restart your headset, connect the USB to the computer and WiVRn should detect it automatically.
 
 ## Configuration
 
@@ -359,6 +387,22 @@ flatpak uninstall --unused
 ```
 
 ## Troubleshooting
+
+### Broken cache on GNOME Software
+
+Sometimes, the cache on GNOME Software breaks and icons stop loading at the store. First, stop any running proccess:
+```
+pkill -f gnome-software
+```
+Then clean the store cache:
+```
+rm -rf ~/.cache/gnome-software
+```
+Also on /var:
+```
+sudo rm -rf /var/cache/gnome-software
+```
+Now open GNOME Software again and let it recreate the icon cache.
 
 ### Error checking
 
