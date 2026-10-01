@@ -1,8 +1,8 @@
 # Arch Linux Handbook
 
 - Written by: KairanD.
-- Version: 1.9.1.
-- Date: 2026/09/27.
+- Version: 1.9.2.
+- Date: 2026/10/01.
 - GNOME version: 50.
 - License: CC BY-SA 4.0. You may share and adapt the content with attribution, and derivative works must be released under the same license.
 
@@ -183,11 +183,14 @@ These are other applications I use.
 * LosslessCut (Mikael Finstad): quick and easy editor for video files.
 * Minecraft (Mojang AB): official Minecraft launcher.
 * Minion (Good Game Mods, LLC): addon manager for The Elder Scrolls Online.
+* OnlyOffice (ONLYOFFICE): another office suite, better for Microsoft formats.
 * OpenRGB (Adam Honse, OpenRGB Team): manages RGB devices.
 * PDF Arranger (The PDF Arranger team): edits and resizes PDF files.
 * PDF Tricks (Murilo Venturoso): compresses PDF files.
 * Parabolic (Nickvision): downloads videos from the web.
+* Popsicle (System76): create bootable drives in parallel.
 * Protontricks (Janne Pulkkinen): software to manage Steam's Proton game prefixes.
+* ProtonUp-Qt (DavidoTek): software to manage proton versions.
 * SoundConverter (Gautier Portet): multi format audio files converter.
 * Steam (Valve Corporation): Steam client.
 * Steam Link (Valve Corporation): application to receive straming signal from a Steam client.
@@ -305,7 +308,7 @@ Open the WiVRn server on your computer and it will appear on the headset's clien
 
 If you have a Meta Quest and want to use a USB connection (way less latency), first install the adb package:
 ```
-sudo apt install adb
+sudo pacman -S android-tools
 ```
 Then you need to enter the Meta Developers website (https://developers.meta.com/horizon/manage/) and create a organization for your account. Then use the Meta Horizon app on your smartphone, connect to your headset, go to options and activate developer mode. Restart your headset, connect the USB to the computer and WiVRn should detect it automatically.
 
@@ -434,6 +437,53 @@ And check if anything is using Pacman. If not, run:
 sudo rm /var/lib/pacman/db.lck
 ```
 To remove the lock.
+
+### Corrupted bootloader (systemd-boot):
+
+If, for whatever reason (it's unusual), your bootloader gets corrupted, you can fix it by using an Arch Linux boot drive to chroot. Boot in the live environment and do:
+```
+lsblk
+```
+Search for your main disk's name and then mount it. For example:
+```
+mount /dev/nvme0n1p2 /mnt
+```
+Then let's create a temporary boot directory:
+```
+mkdir -p /mnt/boot
+```
+Then mount it. For example:
+```
+mount /dev/nvme0n1p1 /mnt/boot
+```
+Then enter the chroot environment:
+```
+arch-chroot -S /mnt
+```
+Then install the bootloader again:
+```
+bootctl install
+```
+And update it:
+```
+bootctl update
+```
+And then list the entries to check it worked:
+```
+bootctl list
+```
+Then run mkinitcpio:
+```
+mkinitcpio -P
+```
+Now unmount the chroot enviroment:
+```
+umount -R /mnt
+```
+Now you can reboot your machine, enter your original system and see if it's working fine again:
+```
+sudo reboot
+```
 
 ### Steam game adjustments
 
