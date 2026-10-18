@@ -1,8 +1,8 @@
 # Arch Linux Handbook
 
 - Written by: KairanD.
-- Version: 1.9.3.
-- Date: 2026/10/04.
+- Version: 1.9.4.
+- Date: 2026/10/18.
 - GNOME version: 50.
 - License: CC BY-SA 4.0. You may share and adapt the content with attribution, and derivative works must be released under the same license.
 
@@ -168,7 +168,6 @@ These are other applications I use.
 * Boxes (The GNOME Project): virtual machines manager.
 * Chromium (The Chromium Authors): alternative web browser.
 * Dconf Editor (GNOME Project): edit hidden system options.
-* Deep Dive (Tanay Bhomia): complete pomodoro timer.
 * Descodificator (Bilal Elmoussaoui): reads and generates QR codes.
 * Discord (Discord Inc.): Discord client.
 * Earbud manager for Galaxy Buds (Tim Schneeberger): audio manager for Samsung's Galaxy Buds.
@@ -193,6 +192,7 @@ These are other applications I use.
 * Proton VPN (Proton AG): easy VPN application.
 * Protontricks (Janne Pulkkinen): software to manage Steam's Proton game prefixes.
 * ProtonUp-Qt (DavidoTek): software to manage proton versions.
+* Solanum (Christopher Davis): pomodoro timer.
 * SoundConverter (Gautier Portet): multi format audio files converter.
 * Steam (Valve Corporation): Steam client.
 * Steam Link (Valve Corporation): application to receive straming signal from a Steam client.
@@ -228,11 +228,13 @@ Computers with less processing power may also struggle to load web pages with to
 
 #### OpenRGB
 
-The udev rules are necessary to have access to RGB devices. They are provided in the "resources" folder within this repository. Open a Console in the same folder you downloaded the file and do:
+The udev rules are necessary to have access to RGB devices. Since OpenRGB 1.0, there is a script to generate them. Do:
 ```
-sudo cp 60-openrgb.rules /etc/udev/rules.d/
+sudo mkdir -p /etc/udev/rules.d
+sudo sh -c 'flatpak run org.openrgb.OpenRGB --print-udev-rules > /etc/udev/rules.d/60-openrgb.rules'
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
+Sometimes a newer kernel is required to get support for some devices.
 
 #### Rhythmbox
 
@@ -287,6 +289,9 @@ Some versions of the Unity Editor crash when loading a project. It is necessary 
 #### VSCodium
 
 Go to settings, window and "auto detect color scheme" to enable light and dark theme switching.
+
+Useful extensions:
+- PlatformIO IDE for VSCodium/Cursor: allows Arduino and ESP32 programming and reading. Update clang when asked. It will take some time to download and install dependencies the first time you start the extension.
 
 #### WiVRn
 
@@ -343,6 +348,10 @@ sudo apt install spice-webdavd
 ```
 It's also good to go to the energy options and disable automatic suspension and screen turnoff.
 
+### Windows 10
+
+Windows 10 is easier to install than Windows 11. Just disable your Internet connection after it reboots the first time and it will offer you the option to use a local account. Then, as shown below for Windows 11, install the Spice drivers and disable the telemetry and delivery optimization options. You can also do a debloat and use the Disk Cleaning tool after all updates.
+
 ### Windows 11
 
 To install Windows 11 on Boxes, first we need to disable the TPM 2.0 requirement. Press Shift + F10 when the incompatibility screen appears. Then type `regedit` and go to HKEY_LOCAL_MACHINE\SYSTEM\Setup. Create a new key labeled "LabConfig". Create a 32 bit DWORD value containing `BypassTPMCheck = 1`. Click to go back and try again.
@@ -351,7 +360,7 @@ To disable the Microsoft account requirement and create a local account, press S
 
 To have faster speed and automatic resolution resizing, use your virtual machine to go to https://www.spice-space.org/download.html and download and install the Spice Guest Tools for Windows. To have folder sharing, also install the Spice WebDAV Daemon.
 
-On Windows 11, disable Delivery Optimization. Then go to the privacy options tab and disable every telemetry you can. Also do a little debloat editing your system bar and removing unwanted applications. Finally, start the Disk Cleaning tool, choose to clean system files, select everything and wait.
+On Windows 11, disable delivery optimization. Then go to the privacy options tab and disable every telemetry you can. Also do a little debloat editing your system bar and removing unwanted applications. Finally, start the Disk Cleaning tool, choose to clean system files, select everything and wait.
 
 ## Maintenance
 
